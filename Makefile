@@ -3,6 +3,12 @@ PHP=$(COMPOSE) exec php
 CONSOLE=$(PHP) bin/console
 COMPOSER=$(PHP) composer
 
+encore_dev:
+	@${COMPOSE} run node yarn encore dev
+
+encore_prod:
+	@${COMPOSE} run node yarn encore production
+	
 up:
 	@${COMPOSE} up -d
 

@@ -2,38 +2,21 @@
 
 {% block title %}Course index{% endblock %}
 
-{% block body %}
-    <h1>Course index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Char_code</th>
-                <th>Name</th>
-                <th>Content</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+{% block body %} 
+<div class="container">
+    <h1 class="text-center">Курсы под любые цели</h1>
+    <div class="row g-2">
         {% for course in courses %}
-            <tr>
-                <td>{{ course.id }}</td>
-                <td>{{ course.charCode }}</td>
-                <td>{{ course.name }}</td>
-                <td>{{ course.content }}</td>
-                <td>
-                    <a href="{{ path('app_course_show', {'id': course.id}) }}">show</a>
-                    <a href="{{ path('app_course_edit', {'id': course.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
+        <div class="card row-6 border border-dark p-3 m-3 bg-light" style="width: 18rem;">
+            <img src="{{course.image}}" class="card-img-top" style="height: 15rem; width: 100%;" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{course.name}}</h5>
+                <p class="card-text overflow-hidden" style="height: 8rem; width: 100%;">{{course.content}}</p>
+                <a href="{{ path('app_course_show', {'id': course.id}) }}" class="btn btn-dark" style="width: 100%;">Подробнее</a>
+            </div>
+        </div>
         {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_course_new') }}">Create new</a>
+        <a href="{{ path('app_course_new') }}" class="btn btn-warning">Создать новый курс</a>
+    </div>
+</div>
 {% endblock %}

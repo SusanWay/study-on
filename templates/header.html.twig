@@ -1,0 +1,54 @@
+<header>
+  <div class="wrap-logo">
+  <a href="#" class="logo">Тут точно будет название</a>
+  </div>
+  <nav>
+    <a class="m-3" href="http://study-on.local:81/course/">Главная</a>
+    <a class="m-3" href="#">Вход</a>
+    <a class="m-3" href="#">Регистрация</a>
+  </nav>
+</header>
+
+<style>
+    header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        background-color: #FFEB3B;
+        padding: 20px 10px;
+    }
+        
+    .wrap-logo {
+            display: flex;
+            align-items: center;
+        
+    }
+        
+    header a {
+            color: #212121;
+            padding: 12px;
+            text-decoration: none;
+            font-size: 18px; 
+            border-radius: 4px;
+    }
+        
+    header a.logo {
+            font-size: 25px;
+            font-weight: bold;
+    }
+        
+    header a:hover {
+        background-color: #FBC02D;
+        color: #212121;
+    }
+        
+    header a.active {
+        background-color: #FBC02D;
+    }
+        
+    nav {
+        display: flex;
+        align-items: center;
+    }
+</style>

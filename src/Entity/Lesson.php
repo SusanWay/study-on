@@ -18,18 +18,12 @@ class Lesson
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Course::class, inversedBy="lessons_list")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $course_code;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=1000)
+     * @ORM\Column(type="text")
      */
     private $content;
 
@@ -38,21 +32,15 @@ class Lesson
      */
     private $lesson_number;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Course::class, inversedBy="lessons")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $id_course;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCourseCode(): ?Course
-    {
-        return $this->course_code;
-    }
-
-    public function setCourseCode(?Course $course_code): self
-    {
-        $this->course_code = $course_code;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -87,6 +75,18 @@ class Lesson
     public function setLessonNumber(int $lesson_number): self
     {
         $this->lesson_number = $lesson_number;
+
+        return $this;
+    }
+
+    public function getIdCourse(): ?Course
+    {
+        return $this->id_course;
+    }
+
+    public function setIdCourse(?Course $id_course): self
+    {
+        $this->id_course = $id_course;
 
         return $this;
     }

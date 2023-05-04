@@ -22,7 +22,7 @@ class Course
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $char_code;
+    private $character_code;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -35,13 +35,18 @@ class Course
     private $content;
 
     /**
-     * @ORM\OneToMany(targetEntity=Lesson::class, mappedBy="course_code")
+     * @ORM\OneToMany(targetEntity=Lesson::class, mappedBy="id_course", orphanRemoval=true)
      */
-    private $lessons_list;
+    private $lessons;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $image;
 
     public function __construct()
     {
-        $this->lessons_list = new ArrayCollection();
+        $this->lessons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,14 +54,14 @@ class Course
         return $this->id;
     }
 
-    public function getCharCode(): ?string
+    public function getCharacterCode(): ?string
     {
-        return $this->char_code;
+        return $this->character_code;
     }
 
-    public function setCharCode(string $char_code): self
+    public function setCharacterCode(string $character_code): self
     {
-        $this->char_code = $char_code;
+        $this->character_code = $character_code;
 
         return $this;
     }
@@ -88,29 +93,45 @@ class Course
     /**
      * @return Collection<int, Lesson>
      */
-    public function getLessonsList(): Collection
+    public function getLessons(): Collection
     {
-        return $this->lessons_list;
+        return $this->lessons;
     }
 
-    public function addLessonsList(Lesson $lessonsList): self
+    public function addLesson(Lesson $lesson): self
     {
-        if (!$this->lessons_list->contains($lessonsList)) {
-            $this->lessons_list[] = $lessonsList;
-            $lessonsList->setCourseCode($this);
+        if (!$this->lessons->contains($lesson)) {
+            $this->lessons[] = $lesson;
+            $lesson->setIdCourse($this);
         }
 
         return $this;
     }
 
-    public function removeLessonsList(Lesson $lessonsList): self
+    public function removeLesson(Lesson $lesson): self
     {
-        if ($this->lessons_list->removeElement($lessonsList)) {
+        if ($this->lessons->removeElement($lesson)) {
             // set the owning side to null (unless already changed)
-            if ($lessonsList->getCourseCode() === $this) {
-                $lessonsList->setCourseCode(null);
+            if ($lesson->getIdCourse() === $this) {
+                $lesson->setIdCourse(null);
             }
         }
+
+        return $this;
+    }
+
+    public function __toString() {
+        return $this->name;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

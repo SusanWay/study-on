@@ -15,7 +15,7 @@ class LessonType extends AbstractType
             ->add('name')
             ->add('content')
             ->add('lesson_number')
-            ->add('course_code')
+            ->add('id_course')
         ;
     }
 
