@@ -15,12 +15,12 @@
             <h2> Список уроков </h2>
             <div class="container">
                 <div class="row">
-                    {% for lesson in course.lessons %}
+                    {% for lesson in course.lessons|sort((a, b) => a.getLessonNumber() <=> b.getLessonNumber()) %}
                         <div class="card row-6 border border-dark p-3 m-3 bg-light" style="width: 18rem;">
                             <div class="card-body">
                                 <h5 class="card-title overflow-hidden" style="height: 5rem;"> {{lesson.getLessonNumber()}}. {{lesson.name}} </h5>
                                 <p class="card-text overflow-hidden" style="height: 9rem; width: 100%;"> {{lesson.content}} </p>
-                                <a href="{{ path('app_lesson_show', {'id': lesson.id}) }}" class="btn btn-dark" style="width: 100%;">Пройти урок</a>
+                                <a href="{{ path('app_lesson_show', { 'id' : lesson.id }) }}" class="btn btn-dark" style="width: 100%;">Пройти урок</a>
                             </div>
                         </div>
                     {% endfor %}
@@ -32,7 +32,7 @@
         <div class="d-flex m-3 p-3">
             <a href="{{ path('app_course_index') }}" class="btn btn-warning m-3 p-3" style="width: 16rem;">Назад</a>
             <a href="{{ path('app_course_edit', {'id': course.id}) }}" class="btn btn-warning m-3 p-3" style="width: 16rem;">Редактировать курс</a>
-
+            <a  href="{{ path('app_lesson_new') }}" class="btn btn-warning m-3 p-3" style="width: 16rem;">Добавить урок</a>
             {{ include('course/_delete_form.html.twig') }}
         </div>
     </div>

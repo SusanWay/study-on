@@ -12,9 +12,27 @@ class LessonType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('content')
-            ->add('lesson_number')
+            ->add('name', TextType::class, [
+                'required' => true,
+                'label' => 'Название',
+                'constraints' => [new Length(['min' => 3, 'max'=>255, 'maxMessage' => 'Название должно быть не более 255 символов']),
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
+                'attr' => ['class ' => 'form-control']
+            ])
+            ->add('content', TextareaType::class, [
+                'label' => 'Описание',
+                'attr' => ['class ' => 'form-control'],
+                'constraints' => [
+                    new Length(['max'=>1000, 'maxMessage' => 'Описание должно быть не более 1000 символов']),
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
+                ])
+            ->add('lesson_number', IntegerType::class, [
+                'required' => true,
+                'label' => 'Порядковый номер',
+                'attr' => ['class ' => 'form-control mb-2'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
+            ])
             ->add('id_course')
         ;
     }

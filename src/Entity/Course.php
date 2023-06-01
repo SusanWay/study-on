@@ -9,7 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CourseRepository::class)
- */
+*/
+//#[UniqueEntity(fields: "character_code", message: "Такой символьный код уже существует")]
 class Course
 {
     /**
@@ -121,7 +122,7 @@ class Course
     }
 
     public function __toString() {
-        return $this->name;
+        return (string) $this->id;
     }
 
     public function getImage(): ?string
