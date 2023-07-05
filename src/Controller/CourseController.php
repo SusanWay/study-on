@@ -3,11 +3,20 @@
 namespace App\Controller;
 
 use App\Entity\Course;
+use App\Exception\BillingUnavailableException;
 use App\Form\CourseType;
 use App\Repository\CourseRepository;
+use App\Security\User;
+use App\Service\BillingClient;
+use App\Utils\ResponseParser;
+use Exception;
+use JsonException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -15,13 +24,43 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CourseController extends AbstractController
 {
+
+    private CourseRepository $courseRepository;
+    private BillingClient $billingClient;
+    private ResponseParser $responseParser;
+
+    public function __construct(
+        CourseRepository $courseRepository,
+        BillingClient $billingClient,
+        ResponseParser $responseParser) {
+        $this->courseRepository = $courseRepository;
+        $this->billingClient = $billingClient;
+        $this->responseParser = $responseParser;
+    }
     /**
      * @Route("", name="app_course_index", methods={"GET"})
      */
     public function index(CourseRepository $courseRepository): Response
     {
+        $courses = $this->courseRepository->findAll();
+        $transactions = [];
+
+        $courseResponse = $this->billingClient->getCourses();
+        $coursesArray = $this->responseParser->parseCourses($courseResponse, $courses);
+
+
+        if ($this->getUser() !== null) {
+            $user = $this->getUser();
+            $transactionResponse = $this->billingClient->getTransactions(
+                $user->getToken(),
+                ['skip_expired' => true, 'type' => 'payment']
+            );
+            $transactions = $this->responseParser->parseTransactions($transactionResponse);
+        }
+
         return $this->render('course/index.html.twig', [
-            'courses' => $courseRepository->findAll(),
+            'courses' => $coursesArray,
+            'transactions' => $transactions
         ]);
     }
 
@@ -49,10 +88,39 @@ class CourseController extends AbstractController
     /**
      * @Route("/{id}", name="app_course_show", methods={"GET"})
      */
-    public function show(Course $course): Response
+    public function show(Course $course, Request $request): Response
     {
+        $owned = false;
+        $disabled = true;
+        if ($this->getUser() !== null) {
+            $user = $this->getUser();
+            $courseBilling = $this->billingClient->getCourse($course->getCharacterCode());
+            if (isset($courseBilling['type'])) {
+                if ($courseBilling['type'] === 'free') {
+                    $owned = true;
+                } else {
+                    $transactions = $this->billingClient->getTransactions(
+                        $user->getToken(),
+                        ['skip_expired' => true, 'code' => $course->getCharacterCode()]
+                    );
+                    if (isset($transactions[0])){
+                        $owned = true;
+                    } else {
+                        $currentUser = $this->billingClient->getBillingUser($user->getToken());
+                        if ($currentUser['balance'] >= $courseBilling['price']) {
+                            $disabled = false;
+                        }
+                    }
+                }
+            } else {
+                $owned = true;
+            }
+        }
+
         return $this->render('course/show.html.twig', [
             'course' => $course,
+            'owned' => $owned,
+            'disabled' => $disabled
         ]);
     }
 
@@ -86,5 +154,27 @@ class CourseController extends AbstractController
         }
 
         return $this->redirectToRoute('app_course_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @throws BillingUnavailableException
+     * @throws \JsonException
+     * @Route("/buy/{id}", name="app_course_buy", methods={"POST"})
+     */
+    public function buy(Course $course, Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        try {
+            $response = $this->billingClient->buyCourse($user->getToken(), $course->getCharacterCode());
+            if (isset($response['code'])) {
+                $this->addFlash('error', $response['message']);
+            } else {
+                $this->addFlash('success', 'Курс успешно оплачен');
+            }
+        } catch (BillingUnavailableException| \Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+        return $this->redirectToRoute('app_course_show', ['id' => $course->getId()], Response::HTTP_SEE_OTHER);
     }
 }

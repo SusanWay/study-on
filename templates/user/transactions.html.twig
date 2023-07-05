@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Транзакции{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <p class="h1 text-center mt-2"> Ваши транзакции</p>
+        <table class="table table-dark mt-5">
+            <thead>
+            <tr>
+                <th scope="col">Номер транзакции</th>
+                <th scope="col">Время</th>
+                <th scope="col">Арендован до</th>
+                <th scope="col">Тип</th>
+                <th scope="col">Сумма</th>
+                <th scope="col">Код курса</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <th scope="row" class="{{ transaction.type == '1' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.id }}
+                </th>
+                <td class="{{ transaction.type == '1' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.created.date }}
+                </td>
+                <td class="{{ transaction.type == '1' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {% if transaction.expires is not null %}
+                    {{ transaction.expires.date }}
+                    {% endif %}
+                </td>
+                <td class="{{ transaction.type == '1' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {% if transaction.type == 1%}
+                        deposite
+                    {% else %}
+                        payment
+                    {% endif %}
+                </td>
+                <td class="{{ transaction.type == '1' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.amount }}
+                </td>
+                {% if transaction.code is defined and transaction.code is not empty %}
+                    <td class="text-bg-dark">{{ transaction.code }}</td>
+                {% else %}
+                    <td class="text-bg-success">---</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

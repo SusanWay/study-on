@@ -6,6 +6,14 @@ use App\Entity\Lesson;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+
 
 class LessonType extends AbstractType
 {
@@ -28,12 +36,15 @@ class LessonType extends AbstractType
                 ])
             ->add('lesson_number', IntegerType::class, [
                 'required' => true,
-                'label' => 'Порядковый номер',
+                'label' => 'Номер урока',
                 'attr' => ['class ' => 'form-control mb-2'],
                 'constraints' => [
                     new NotBlank(['message' => 'Поле не должно быть пустым!'])],
             ])
-            ->add('id_course')
+            ->add('id_course', HiddenType::class, [
+                'data' => null,
+                'disabled' => true
+            ])
         ;
     }
 

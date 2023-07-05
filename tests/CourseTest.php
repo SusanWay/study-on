@@ -179,39 +179,39 @@ class CourseControllerTest extends AbstractTest
     }
 
     public function testCourseSuccessfulEditing(): void
-        {
-            // список курсов
-            $client = $this->getClient();
-            $crawler = $client->request('GET', '/course');
-            $this->assertResponseOk();
+    {
+        // список курсов
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/course');
+        $this->assertResponseOk();
 
-            // переход на первый курс
-            $link = $crawler->selectLink('Подробнее')->first()->link();
-            $crawler = $client->click($link);
-            $this->assertResponseOk();
+        // переход на первый курс
+        $link = $crawler->selectLink('Подробнее')->first()->link();
+        $crawler = $client->click($link);
+        $this->assertResponseOk();
 
-            // переход на окно редактирования
-            $link = $crawler->selectLink('Редактировать курс')->link();
-            $crawler = $client->click($link);
-            $this->assertResponseOk();
-            $form = $crawler->selectButton('Сохранить изменения')->form();
+        // переход на окно редактирования
+        $link = $crawler->selectLink('Редактировать курс')->link();
+        $crawler = $client->click($link);
+        $this->assertResponseOk();
+        $form = $crawler->selectButton('Сохранить изменения')->form();
 
-            // сохранение id редактируемого курса
-            $courseId = $this->getEntityManager()
-                ->getRepository(Course::class)
-                ->findOneBy(['character_code' => $form['course[character_code]']->getValue()])->getId();
+        // сохранение id редактируемого курса
+        $courseId = $this->getEntityManager()
+            ->getRepository(Course::class)
+            ->findOneBy(['character_code' => $form['course[character_code]']->getValue()])->getId();
 
-            // заполнение формы корректными значениями
-            $form['course[character_code]'] = 'dc78';
-            $form['course[name]'] = 'name';
-            $form['course[content]'] = 'content';
-            $form['course[image]'] = 'https://i.pinimg.com/originals/8a/de/fe/8adefe5af862b4f9cec286c6ee4722cb.jpg';
-            $client->submit($form);
+        // заполнение формы корректными значениями
+        $form['course[character_code]'] = 'dc78';
+        $form['course[name]'] = 'name';
+        $form['course[content]'] = 'content';
+        $form['course[image]'] = 'https://i.pinimg.com/originals/8a/de/fe/8adefe5af862b4f9cec286c6ee4722cb.jpg';
+        $client->submit($form);
 
-            // редирект
-            $crawler = $client->followRedirect();
-            $this->assertResponseOk();
+        // редирект
+        $crawler = $client->followRedirect();
+        $this->assertResponseOk();
 
-            //$this->assertRouteSame('app_course_show', ['id' => $courseId]);
-        }
+        //$this->assertRouteSame('app_course_show', ['id' => $courseId]);
+    }
 }

@@ -8,15 +8,45 @@
     <div class="row g-2">
         {% for course in courses %}
         <div class="card row-6 border border-dark p-3 m-3 bg-light" style="width: 18rem;">
-            <img src="{{course.image}}" class="card-img-top" style="height: 15rem; width: 100%;" alt="...">
+            <img src="{{course.data.image}}" class="card-img-top" style="height: 15rem; width: 100%;" alt="...">
             <div class="card-body">
-                <h5 class="card-title">{{course.name}}</h5>
-                <p class="card-text overflow-hidden" style="height: 8rem; width: 100%;">{{course.content}}</p>
-                <a href="{{ path('app_course_show', {'id': course.id}) }}" class="btn btn-dark" style="width: 100%;">Подробнее</a>
+                <h5 class="card-title">{{course.data.name}}</h5>
+                <p class="card-text overflow-hidden" style="height: 8rem; width: 100%;">{{course.data.content}}</p>
+
+                {% if is_granted('ROLE_USER') %}
+                    {% if transactions[course.data.getCharacterCode] is defined
+                        and transactions[course.data.getCharacterCode] is not empty %}
+                        {% if transactions[course.data.getCharacterCode]['type'] == 'buy' %}
+                            <h6 class="card-title mb-2">Курс куплен</h6>
+                        {% elseif transactions[course.data.getCharacterCode]['type'] == 'rent' %}
+                            <h6 class="card-title mb-2"">
+                                Курс аредован до {{ transactions[course.data.getCharacterCode]['expires_at']|date }}
+                            </h6>
+                        {% endif %}
+                    {% else %}
+                        {% if course.type == 'free' %}
+                            <h6 class="card-title mb-2"">Курс бесплатный</h6>
+                        {% else %}
+                            {% if course.type == 'rent' %}
+                                <h6 class="card-title mb-2"">
+                                    Цена аренды: {{ course.price }}
+                                </h6>
+                            {% elseif course.type == 'buy' %}
+                                <h6 class="card-title mb-2"">
+                                    Цена покупки: {{ course.price }}
+                                </h6>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+                <a href="{{ path('app_course_show', {'id': course.data.id}) }}" class="btn btn-dark" style="width: 100%;">Подробнее</a>
             </div>
         </div>
         {% endfor %}
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
         <a href="{{ path('app_course_new') }}" class="btn btn-warning">Создать новый курс</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

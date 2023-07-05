@@ -5,16 +5,33 @@ namespace App\Controller;
 use App\Entity\Lesson;
 use App\Form\LessonType;
 use App\Repository\LessonRepository;
+use App\Repository\CourseRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * @Route("/lesson")
  */
 class LessonController extends AbstractController
 {
+    private LessonRepository $lessonRepository;
+    private CourseRepository $courseRepository;
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
+        LessonRepository $lessonRepository,
+        CourseRepository $courseRepository,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->courseRepository = $courseRepository;
+        $this->lessonRepository = $lessonRepository;
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * @Route("/", name="app_lesson_index", methods={"GET"})
      */
@@ -26,18 +43,23 @@ class LessonController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="app_lesson_new", methods={"GET", "POST"})
+     * @Route("/new/{id}", name="app_lesson_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, LessonRepository $lessonRepository): Response
+    public function new(Request $request, int $id): Response
     {
         $lesson = new Lesson();
         $form = $this->createForm(LessonType::class, $lesson);
         $form->handleRequest($request);
+        $lesson->setIdCourse($this->courseRepository->find(['id' => $id]));
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $lessonRepository->add($lesson, true);
-
-            return $this->redirectToRoute('app_lesson_index', [], Response::HTTP_SEE_OTHER);
+            $this->entityManager->persist($lesson);
+            $this->entityManager->flush($lesson);
+            return $this->redirectToRoute(
+                'app_course_show',
+                ['id' => $lesson->getIdCourse()],
+                Response::HTTP_SEE_OTHER
+            );
         }
 
         return $this->renderForm('lesson/new.html.twig', [

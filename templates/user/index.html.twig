@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div id="email" class="m-2 p-2">
+            <p>Email: {{ user.email }}</p>
+        </div>
+        <div id="role" class="m-2 p-2">
+            <p>Ваша роль:
+                {% if user.roles[0] == 'ROLE_USER' %}
+                    Пользователь
+                {% elseif user.roles[0] == 'ROLE_SUPER_ADMIN' %}
+                    Администратор
+                {% endif %}
+            </p>
+        </div>
+        <div class="m-2 p-2">
+            <p>Текущий баланс: {{ balance }}</p>
+        </div>
+    </div>
+{% endblock %}

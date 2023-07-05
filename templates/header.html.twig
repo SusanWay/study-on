@@ -3,10 +3,17 @@
   <a href="#" class="logo">Тут точно будет название</a>
   </div>
   <nav>
-    <a class="m-3" href="http://study-on.local:81/course/">Главная</a>
-    <a class="m-3" href="#">Вход</a>
-    <a class="m-3" href="#">Регистрация</a>
+    <a class="m-3" href="{{ path('app_course_index') }}">Главная</a>
+    {% if is_granted('ROLE_USER') %}
+      <a href="{{ path('app_profile') }}" class="m-3">Профиль</a>
+      <a href="{{ path('app_user_transactions') }}" class="m-3">Транзакции</a>
+      <a href="{{ path('app_logout') }}" class="m-3">Выйти</a>
+    {% else %}
+      <a href="{{ path('app_registration') }}" class="m-3">Регистрация</a>
+      <a href="{{ path('app_login') }}" class="m-3">Войти</a>
+    {% endif %}
   </nav>
+
 </header>
 
 <style>
